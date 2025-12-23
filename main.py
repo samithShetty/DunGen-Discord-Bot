@@ -1,22 +1,30 @@
-import discord
 from config import BOT_TOKEN
+import discord
+from discord.ext import commands
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 @bot.event
 async def on_ready():
     print(f'Logged on as {bot.user}!')
 
-@bot.event
-async def on_message(message: discord.Message):
-    print(f'Message from {message.author}: {message.content}')
-    if message.author == bot.user:
-        return
-    
-    if message.content == "arise":
-        await message.channel.send("https://media.discordapp.net/attachments/648637142666444840/999212583020146698/TV_wake.gif?ex=694a413c&is=6948efbc&hm=851956e0af8fde60551806115bcd9d23cc256a6f3b3a33030c8f1b5e96f0607a&")
+@bot.command()
+async def ping(ctx):
+    print('Ping command invoked')
+    await ctx.reply('Pong!')
+
+@bot.hybrid_command()
+async def sync(ctx):
+    """Syncs slash commands in app commands tree"""
+    synced = await ctx.bot.tree.sync()
+    await ctx.reply(f'Synced {len(synced)} commands.')
+
+@bot.hybrid_command()
+async def slash_demo(ctx):
+    """A simple slash command demo"""
+    await ctx.reply('This is a slash command response!')
 
 bot.run(BOT_TOKEN)
