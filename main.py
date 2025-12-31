@@ -1,6 +1,7 @@
 from config import BOT_TOKEN
 import discord
 from discord.ext import commands
+from cogs.HeroCog import HeroCog
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -23,8 +24,11 @@ async def sync(ctx):
     await ctx.reply(f'Synced {len(synced)} commands.')
 
 @bot.hybrid_command()
-async def slash_demo(ctx):
+async def load_cog(ctx):
     """A simple slash command demo"""
-    await ctx.reply('This is a slash command response!')
+    await bot.remove_cog('HeroCog')
+    await bot.add_cog(HeroCog(bot))
+    print(bot.cogs)
+    await ctx.reply('HeroCog loaded!')
 
 bot.run(BOT_TOKEN)
