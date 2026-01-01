@@ -3,3 +3,6 @@ __pycache__/
 
 # Local Token Storage 
 config.py 
+
+# Local Debug/Testing Scripts
+local/
