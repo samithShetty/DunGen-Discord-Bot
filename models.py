@@ -6,11 +6,11 @@ from typing import Annotated
 PyObjectID = Annotated[ObjectId, BeforeValidator(lambda v: ObjectId(v))]
 
 class Stats(BaseModel):
-    MAX_HP: int = Field(description="Maximum Health")
-    ATK: int = Field(description="Attack Power")
-    DEF: int = Field(description="Defense")
-    SPD: int = Field(description="Speed")
-    EVA: int = Field(description="Evasion")
+    MAX_HP: int = Field(description="Maximum Health", alias='health')
+    ATK: int = Field(description="Attack Power", alias='attack')
+    DEF: int = Field(description="Defense", alias='defense')
+    SPD: int = Field(description="Speed", alias='speed')
+    EVA: int = Field(description="Evasion", alias='evasion')
     
 class Hero(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
@@ -19,7 +19,7 @@ class Hero(BaseModel):
     owner_id: str | None = Field(description='The discord (snowflake) id of the player who owns this hero')
     name: str
     level: int
-    HP: int
+    HP: int = Field(alias='current_health')
     stats: Stats
-    createdAt: datetime
+    created_at: datetime
     

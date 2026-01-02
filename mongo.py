@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from config import MONGODB_URI
 from models import Stats, Hero
 from datetime import datetime, timezone
+from typing import List
 
 
 
@@ -14,7 +15,7 @@ hero_db = database['Heroes']
 hero_db.create_index('owner_id')
 
 
-def create_hero_for_user(user_id: int, name: str, stats: Stats, level: int):
+def create_hero_for_user(user_id: int, name: str, stats: Stats, level: int) -> Hero:
     new_hero = Hero(
         name=name,
         level=level,
@@ -28,8 +29,11 @@ def create_hero_for_user(user_id: int, name: str, stats: Stats, level: int):
     return new_hero
     
 
-def get_heroes_for_user(user_id: int):
-    return hero_db.find({'owner_id': str(user_id)})
+def get_heroes_for_user(user_id: int) -> List[Hero]:
+    cursor = hero_db.find({'owner_id': str(user_id)})
+    return [[Hero.model_validate(doc) for doc in cursor]]
+
+
 
 def update_hero():
     pass
