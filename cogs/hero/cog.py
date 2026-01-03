@@ -9,6 +9,7 @@ from cogs.hero.utils import (
     get_hero_index_from_embed,
     get_player_id_from_embed,
 )
+from utils.types import Context
 
 
 class HeroCog(commands.Cog):
@@ -21,7 +22,7 @@ class HeroCog(commands.Cog):
     @commands.hybrid_command(aliases=["heroes", "lh"])
     async def list_heroes(
         self,
-        ctx: commands.Context[commands.Bot],
+        ctx: Context,
         user: discord.Member | discord.User | None = None,
         index: int = 1,
     ):

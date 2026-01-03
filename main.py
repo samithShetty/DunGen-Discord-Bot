@@ -1,10 +1,12 @@
 import asyncio
 import os
+from typing import List
 
 import discord
 from discord.ext import commands
 
 from config import DISCORD_TOKEN
+from utils.types import Context
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -12,7 +14,6 @@ intents.members = True
 intents.messages = True
 
 bot = commands.Bot(command_prefix=">", intents=intents)
-Context = commands.Context[commands.Bot]
 
 
 @bot.event
@@ -47,12 +48,17 @@ async def sync(ctx: Context):
 @bot.hybrid_command(aliases=["reload"])
 async def reload_cogs(ctx: Context):
     """A simple slash command demo"""
-    await _load_all_cogs(reload=True)
-    await ctx.reply("HeroCog reloaded!")
+    reloaded_cogs = await _load_all_cogs(reload=True)
+
+    if reloaded_cogs:
+        await ctx.reply(f"Reloaded Cogs: {', '.join(reloaded_cogs)}")
+    else:
+        await ctx.reply("Error Occured. No Cogs were reloaded.")
 
 
-async def _load_all_cogs(reload: bool = False):
+async def _load_all_cogs(reload: bool = False) -> List[str]:
     """Automatically (re)loads all of the cogs in the cog directory"""
+    loaded_cogs: List[str] = []
     for module in os.listdir("./cogs"):
         if not module.startswith("__"):
             try:
@@ -60,8 +66,10 @@ async def _load_all_cogs(reload: bool = False):
                     await bot.reload_extension(f"cogs.{module}.cog")
                 else:
                     await bot.load_extension(f"cogs.{module}.cog")
+                loaded_cogs.append(module)
             except Exception as e:  # pylint: disable=broad-exception-caught
                 print(f"Error loading cog from {module} module:\n{e}")
+    return loaded_cogs
 
 
 async def main():  # pylint: disable=missing-function-docstring
