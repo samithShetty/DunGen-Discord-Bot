@@ -4,10 +4,12 @@ from typing import Annotated
 from bson import ObjectId
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
-PyObjectID = Annotated[ObjectId, BeforeValidator(lambda v: ObjectId(v))]
+PyObjectID = Annotated[ObjectId, BeforeValidator(ObjectId)]
 
 
 class Stats(BaseModel):
+    """Upgradeable Stats for all characters"""
+
     MAX_HP: int = Field(description="Maximum Health", alias="health")
     ATK: int = Field(description="Attack Power", alias="attack")
     DEF: int = Field(description="Defense", alias="defense")
@@ -16,6 +18,8 @@ class Stats(BaseModel):
 
 
 class Hero(BaseModel):
+    """Collectable Characters owned and controlled by Players"""
+
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     id: PyObjectID | None = Field(
