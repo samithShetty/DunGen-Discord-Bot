@@ -32,7 +32,7 @@ class Hero(BaseModel):
     )
     name: str
     level: int
-    HP: int = Field(alias="current_health")
+    HP: int
     stats: Stats
     avatar_url: str | None = Field(
         default=None,

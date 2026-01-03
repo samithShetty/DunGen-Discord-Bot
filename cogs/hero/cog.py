@@ -4,8 +4,7 @@ import discord
 from discord.ext import commands
 
 from cogs.hero import utils
-
-from .utils import (
+from cogs.hero.utils import (
     create_hero_menu_for_user,
     get_hero_index_from_embed,
     get_player_id_from_embed,
@@ -71,6 +70,7 @@ class HeroCog(commands.Cog):
         await reaction.remove(player)
         await message.edit(embed=new_hero_menu)
 
+    @commands.Cog.listener()
     async def cog_unload(self):
         importlib.reload(utils)
         return await super().cog_unload()
@@ -79,6 +79,4 @@ class HeroCog(commands.Cog):
 async def setup(bot: commands.Bot):
     """Entry point for adding the HeroCog to the bot"""
     await bot.add_cog(HeroCog(bot))
-    print("Added HeroCog")
-    print("Added HeroCog")
     print("Added HeroCog")
