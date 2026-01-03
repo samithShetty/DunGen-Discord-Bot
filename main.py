@@ -4,7 +4,7 @@ import os
 import discord
 from discord.ext import commands
 
-from cogs.HeroCog import HeroCog
+from cogs.hero.cog import HeroCog
 from config import DISCORD_TOKEN
 
 intents = discord.Intents.default()
@@ -47,14 +47,18 @@ async def reload_cogs(ctx):
     await ctx.reply("HeroCog reloaded!")
 
 
-async def main():
+async def load_all_cogs():
     # Automatically load all the cogs on startup
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
+    for module in os.listdir("./cogs"):
+        if not module.startswith("__"):
             try:
-                await bot.load_extension(f"cogs.{filename[:-3]}")
+                await bot.load_extension(f"cogs.{module}.cog")
             except Exception as e:
-                print(f"Error loading cog {filename}:\n{e}")
+                print(f"Error loading cog from {module} module:\n{e}")
+
+
+async def main():
+    await load_all_cogs()
     await bot.start(DISCORD_TOKEN)
 
 
