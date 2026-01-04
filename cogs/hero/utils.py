@@ -28,6 +28,7 @@ def create_hero_menu_for_user(
     For use in scrollable Hero Menus in list_hero
     """
     owned_heroes = get_heroes_for_user(user.id)
+    print("t2")
     if len(owned_heroes) == 0:
         return discord.Embed(description="User has no Heroes in their party...")
 

@@ -3,13 +3,13 @@ import importlib
 import discord
 from discord.ext import commands
 
-from cogs.hero import utils
+import cogs.hero.utils as hero_utils
 from cogs.hero.utils import (
     create_hero_menu_for_user,
     get_hero_index_from_embed,
     get_player_id_from_embed,
 )
-from utils.types import Context
+from global_utils.types import Context
 
 
 class HeroCog(commands.Cog):
@@ -19,6 +19,11 @@ class HeroCog(commands.Cog):
         self.bot = bot
         self._last_member = None
 
+    @commands.hybrid_command()
+    async def hero_test(self, ctx: Context):
+        """A simple slash command demo"""
+        await ctx.reply("Hero Cog is loaded and working!")
+
     @commands.hybrid_command(aliases=["heroes", "lh"])
     async def list_heroes(
         self,
@@ -27,9 +32,11 @@ class HeroCog(commands.Cog):
         index: int = 1,
     ):
         """Creates a scrollable menu of all heroes owned by a user"""
+        print("List Heroes Invoked by:", ctx.author.display_name)
         user = user or ctx.author
+        print("debug1")
         hero_menu = create_hero_menu_for_user(user, index)
-
+        print("test2")
         message = await ctx.reply(embed=hero_menu)
         await message.add_reaction("◀️")
         await message.add_reaction("▶️")
@@ -71,13 +78,13 @@ class HeroCog(commands.Cog):
         await reaction.remove(player)
         await message.edit(embed=new_hero_menu)
 
-    @commands.Cog.listener()
     async def cog_unload(self):
-        importlib.reload(utils)
+        """Reloads dependent modules on cog unload for hot-reloading during development"""
+        importlib.reload(hero_utils)
         return await super().cog_unload()
 
 
 async def setup(bot: commands.Bot):
-    """Entry point for adding the HeroCog to the bot"""
+    """Entry point for loading the module"""
     await bot.add_cog(HeroCog(bot))
-    print("Added HeroCog")
+    print("Loaded HeroCog")

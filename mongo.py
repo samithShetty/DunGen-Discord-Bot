@@ -34,6 +34,7 @@ def create_hero_for_user(user_id: int, name: str, stats: Stats, level: int) -> H
 
 def get_heroes_for_user(user_id: int) -> List[Hero]:
     """Fetches all Heroes owned by a specific user from the database"""
+    print("t1")
     return [
         Hero.model_validate(doc) for doc in hero_db.find({"owner_id": str(user_id)})
     ]
