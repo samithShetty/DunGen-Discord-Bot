@@ -6,6 +6,7 @@ from discord.ext import commands
 import cogs.hero.utils as hero_utils
 from cogs.hero.utils import (
     create_hero_menu_for_user,
+    generate_hero_for_user,
     get_hero_index_from_embed,
     get_player_id_from_embed,
 )
@@ -17,7 +18,6 @@ class HeroCog(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self._last_member = None
 
     @commands.hybrid_command()
     async def hero_test(self, ctx: Context):
@@ -34,9 +34,7 @@ class HeroCog(commands.Cog):
         """Creates a scrollable menu of all heroes owned by a user"""
         print("List Heroes Invoked by:", ctx.author.display_name)
         user = user or ctx.author
-        print("debug1")
         hero_menu = create_hero_menu_for_user(user, index)
-        print("test2")
         message = await ctx.reply(embed=hero_menu)
         await message.add_reaction("◀️")
         await message.add_reaction("▶️")
@@ -77,6 +75,32 @@ class HeroCog(commands.Cog):
         )
         await reaction.remove(player)
         await message.edit(embed=new_hero_menu)
+
+    @commands.hybrid_command(
+        aliases=["recruit", "roll"],
+    )
+    async def create_hero(
+        self,
+        ctx: Context,
+        name: str | None = None,
+        ATK: int | None = None,
+        DEF: int | None = None,
+        SPD: int | None = None,
+        EVA: int | None = None,
+        MAX_HP: int | None = None,
+    ):
+        """Creates a new Hero for the invoking user"""
+        print(f"Invoked create_hero for User: {ctx.author.display_name}")
+        generate_hero_for_user(
+            user_id=ctx.author.id,
+            name=name,
+            attack=ATK,
+            defense=DEF,
+            speed=SPD,
+            evasion=EVA,
+            max_hp=MAX_HP,
+        )
+        await ctx.reply(f"Generated a new hero for {ctx.author.mention}!")
 
     async def cog_unload(self):
         """Reloads dependent modules on cog unload for hot-reloading during development"""

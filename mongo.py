@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Any, List
 
+from pydantic_core import ValidationError
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -34,10 +35,16 @@ def create_hero_for_user(user_id: int, name: str, stats: Stats, level: int) -> H
 
 def get_heroes_for_user(user_id: int) -> List[Hero]:
     """Fetches all Heroes owned by a specific user from the database"""
-    print("t1")
-    return [
-        Hero.model_validate(doc) for doc in hero_db.find({"owner_id": str(user_id)})
-    ]
+    hero_docs = hero_db.find({"owner_id": str(user_id)})
+    heroes: List[Hero] = []
+    for doc in hero_docs:
+        try:
+            h = Hero.model_validate(doc)
+            heroes.append(h)
+        except ValidationError as e:
+            print(f"Error validating Hero document {doc.get('_id')}: {e}")
+            continue
+    return heroes
 
 
 def update_hero(hero_id: str, updates: dict[str, Any]) -> None:

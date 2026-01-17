@@ -1,5 +1,9 @@
+import importlib
+
 from discord.ext import commands
 
+import models
+import mongo
 from global_utils.load_cogs import load_all_cogs
 from global_utils.types import Context
 
@@ -17,18 +21,25 @@ class DevCog(commands.Cog):
         await ctx.bot.tree.sync(guild=None)
         await ctx.reply("Cleared all bot commands from App Tree")
 
-    @commands.hybrid_command()
+    @commands.hybrid_command(guild_only=True)
     async def sync(self, ctx: Context):
         """Syncs slash commands in app commands tree"""
+        if not ctx.guild:
+            await ctx.reply("This command can only be used in a guild.")
+            return
+
         print(f"Invoked Sync command in guild: {ctx.guild=}")
-        print(ctx.bot.tree.get_commands(guild=ctx.guild))
-        synced = await ctx.bot.tree.sync(guild=None)
-        await ctx.reply(f"Synced {len(synced)} commands.")
+        ctx.bot.tree.copy_global_to(guild=ctx.guild)
+        print("guild commands:", ctx.bot.tree.get_commands(guild=ctx.guild))
+        synced = await ctx.bot.tree.sync(guild=ctx.guild)
         print(f"Synced the following commands: {[cmd.name for cmd in synced]}")
+        await ctx.reply(f"Synced {len(synced)} commands.")
 
     @commands.hybrid_command(aliases=["reload"])
     async def reload_cogs(self, ctx: Context):
         """A simple slash command demo"""
+        importlib.reload(mongo)
+        importlib.reload(models)
         reloaded_cogs = await load_all_cogs(self.bot, reload=True)
         if reloaded_cogs:
             await ctx.reply(f"Reloaded Cogs: {', '.join(reloaded_cogs)}")

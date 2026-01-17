@@ -1,7 +1,7 @@
 import discord
 
-from models import Hero
-from mongo import get_heroes_for_user
+from models import Hero, Stats
+from mongo import create_hero_for_user, get_heroes_for_user
 
 
 def create_hero_embed(hero: Hero) -> discord.Embed:
@@ -28,14 +28,13 @@ def create_hero_menu_for_user(
     For use in scrollable Hero Menus in list_hero
     """
     owned_heroes = get_heroes_for_user(user.id)
-    print("t2")
     if len(owned_heroes) == 0:
         return discord.Embed(description="User has no Heroes in their party...")
 
     true_index = (hero_index - 1) % len(owned_heroes)
     hero_embed = create_hero_embed(owned_heroes[true_index])
     hero_embed.set_author(
-        name=f"{user.display_name}'s Party - {true_index+1}/{len(owned_heroes)}",
+        name=f"{user.display_name}'s Party - {true_index + 1}/{len(owned_heroes)}",
         icon_url=user.display_avatar.url,
     )
     hero_embed.set_footer(text=f"Player ID: {user.id}")
@@ -60,3 +59,27 @@ def get_player_id_from_embed(embed: discord.Embed) -> int:
     if embed.footer.text is None:
         raise ValueError("Embed has no Footer Text. Unable to parse player ID.")
     return int(embed.footer.text.split(": ")[1])
+
+
+def generate_hero_for_user(
+    user_id: int,
+    name: str | None = None,
+    attack: int | None = None,
+    defense: int | None = None,
+    speed: int | None = None,
+    evasion: int | None = None,
+    max_hp: int | None = None,
+) -> None:
+    """Creates a new Hero Document in the database with provided user as owner"""
+    create_hero_for_user(
+        user_id=user_id,
+        name=name or "Unnamed Hero",
+        level=1,
+        stats=Stats(
+            ATK=attack or 0,
+            DEF=defense or 0,
+            SPD=speed or 0,
+            EVA=evasion or 0,
+            MAX_HP=max_hp or 0,
+        ),
+    )

@@ -10,17 +10,22 @@ PyObjectID = Annotated[ObjectId, BeforeValidator(ObjectId)]
 class Stats(BaseModel):
     """Upgradeable Stats for all characters"""
 
-    MAX_HP: int = Field(description="Maximum Health", alias="health")
-    ATK: int = Field(description="Attack Power", alias="attack")
-    DEF: int = Field(description="Defense", alias="defense")
-    SPD: int = Field(description="Speed", alias="speed")
-    EVA: int = Field(description="Evasion", alias="evasion")
+    MAX_HP: int = Field(description="Maximum Health")
+    ATK: int = Field(description="Attack Power")
+    DEF: int = Field(description="Defense")
+    SPD: int = Field(description="Speed")
+    EVA: int = Field(description="Evasion")
 
 
 class Hero(BaseModel):
     """Collectable Characters owned and controlled by Players"""
 
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
+        from_attributes=True,
+        revalidate_instances="always",
+    )
 
     id: PyObjectID | None = Field(
         alias="_id",
